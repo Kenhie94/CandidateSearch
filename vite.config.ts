@@ -7,4 +7,8 @@ dotenv.config({ path: "./environment/.env" });
 export default defineConfig({
   envDir: './enviornment',
   plugins: [react()],
+  base: "/", // Base URL for assets
+  build: {
+    outDir: "dist", // Output directory
+  },
 });
