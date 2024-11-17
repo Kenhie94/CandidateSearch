@@ -1,16 +1,39 @@
-// TODO: Create an interface for the Candidate objects returned by the API
+import { createContext, useContext, useState, ReactNode } from "react";
+
 export interface Candidate {
-  login: string; // GitHub username
-  id: number; // Unique ID
-  avatar_url: string; // URL of the avatar image
-  html_url: string; // Link to the GitHub profile
-  name: string | null; // Full name (nullable)
-  company: string | null; // Company (nullable)
-  blog: string | null; // Blog or website URL (nullable)
-  location: string | null; // Location (nullable)
-  email: string | null; // Email (nullable)
-  bio: string | null; // Short bio (nullable)
-  public_repos: number; // Number of public repositories
-  followers: number; // Number of followers
-  following: number; // Number of users followed
+  login: string;
+  avatar_url: string;
+  location: string | null;
+  email: string | null;
+  company: string | null;
+  bio: string | null;
 }
+
+interface SavedCandidatesContextType {
+  savedCandidates: Candidate[];
+  addCandidate: (candidate: Candidate) => void;
+}
+
+const SavedCandidatesContext = createContext<SavedCandidatesContextType | undefined>(undefined);
+
+export const SavedCandidatesProvider = ({ children }: { children: ReactNode }) => {
+  const [savedCandidates, setSavedCandidates] = useState<Candidate[]>([]);
+
+  const addCandidate = (candidate: Candidate) => {
+    setSavedCandidates((prev) => [...prev, candidate]);
+  };
+
+  return (
+    <SavedCandidatesContext.Provider value={{ savedCandidates, addCandidate }}>
+      {children}
+    </SavedCandidatesContext.Provider>
+  );
+};
+
+export const useSavedCandidates = () => {
+  const context = useContext(SavedCandidatesContext);
+  if (!context) {
+    throw new Error("useSavedCandidates must be used within a SavedCandidatesProvider");
+  }
+  return context;
+};

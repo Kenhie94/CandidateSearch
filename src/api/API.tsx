@@ -1,23 +1,38 @@
 import { Candidate } from "../interfaces/Candidate.interface";
 
-const searchGithub = async () => {
+const defaultCandidate: Candidate = {
+  login: "",
+  avatar_url: "",
+  location: null,
+  email: null,
+  company: null,
+  bio: null,
+};
+
+const searchGithub = async (): Promise<Candidate[]> => {
   try {
     const start = Math.floor(Math.random() * 100000000) + 1;
-    // console.log(import.meta.env);
     const response = await fetch(`https://api.github.com/users?since=${start}`, {
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
       },
     });
-    // console.log('Response:', response);
-    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("invalid API response, check the network tab");
+      throw new Error("Invalid API response, check the network tab");
     }
-    // console.log('Data:', data);
-    return data;
+
+    const data: Candidate[] = await response.json();
+    return data.map((user) => ({
+      login: user.login || "",
+      avatar_url: user.avatar_url || "",
+      location: user.location || null,
+      email: user.email || null,
+      company: user.company || null,
+      bio: user.bio || null,
+    }));
   } catch (err) {
-    // console.log('an error occurred', err);
+    console.error("An error occurred:", err);
     return [];
   }
 };
@@ -29,28 +44,26 @@ const searchGithubUser = async (username: string): Promise<Candidate> => {
         Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
       },
     });
-    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("invalid API response, check the network tab");
+      throw new Error("Invalid API response, check the network tab");
     }
-    return data;
-  } catch (err) {
-    // console.log('an error occurred', err);
+
+    const data: any = await response.json();
+
     return {
-      login: "",
-      id: 0,
-      avatar_url: "",
-      html_url: "",
-      name: null,
-      company: null,
-      blog: null,
-      location: null,
-      email: "",
-      bio: null,
-      public_repos: 0,
-      followers: 0,
-      following: 0,
+      login: data.login || "",
+      avatar_url: data.avatar_url || "",
+      location: data.location || null,
+      email: data.email || null,
+      company: data.company || null,
+      bio: data.bio || null,
     };
+  } catch (err) {
+    console.error("An error occurred:", err);
+
+    // Return a default Candidate object on error
+    return defaultCandidate;
   }
 };
 

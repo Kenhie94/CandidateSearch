@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { searchGithubUser } from "../api/API";
+import { useSavedCandidates } from "../interfaces/Candidate.interface"
 
 const CandidateSearch = () => {
   const [query, setQuery] = useState(""); // Search query
   const [userData, setUserData] = useState<any | null>(null); // User data
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // Loading state
+  const { addCandidate } = useSavedCandidates(); // Access the addCandidate function
+
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,50 +27,45 @@ const CandidateSearch = () => {
     }
   };
 
+  const handleAddCandidate = () => {
+    if (userData) {
+      addCandidate(userData);
+    }
+  };
+
+
   return (
     <div>
-      {/* Header */}
       <h1>Candidate Search</h1>
-
-      {/* Search Section */}
       <div>
-        <div>
-          <input
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            placeholder="Search GitHub username..."
-          />
-          <button onClick={handleSearch} disabled={!query || loading}>
-            {loading ? "Searching..." : "Search"}
-          </button>
-        </div>
-        {error && <p>{error}</p>}
+        <input type="text" value={query} onChange={handleInputChange} placeholder="Search GitHub username..." />
+        <button onClick={handleSearch} disabled={!query || loading}>
+          {loading ? "Searching..." : "Search"}
+        </button>
       </div>
-
-      {/* Results Section */}
+      {error && <p>{error}</p>}
       {userData && (
         <div>
           <img src={userData.avatar_url} alt={`${userData.login}'s avatar`} />
           <div>
             <h2>{userData.login}</h2>
             <p>
-              <strong>Location: {userData.location}</strong>
+              <strong>Location:</strong> {userData.location || "Not specified"}
             </p>
             <p>
-              <strong>Email:</strong>{" "}
-              <a href={userData.html_url} target="_blank" rel="noopener noreferrer">
-                {userData.login}@github.com
-              </a>
+              <strong>Email:</strong> {userData.email ? <a href={`mailto:${userData.email}`}>{userData.email}</a> : `${userData.login}@github.com`}
             </p>
             <p>
-              <strong>Company: {userData.company}</strong>
+              <strong>Company:</strong> {userData.company || "Not specified"}
+            </p>
+            <p>
+              <strong>Bio: </strong> {userData.bio || "Not specified"}
             </p>
           </div>
         </div>
       )}
-      <button>-</button>
-      <button>+</button>
+        <button>-</button>
+        <button onClick={handleAddCandidate}>+</button>
     </div>
   );
 };
