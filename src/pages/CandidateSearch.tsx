@@ -64,7 +64,6 @@ const CandidateSearch = () => {
           </div>
         </div>
       )}
-        <button>-</button>
         <button onClick={handleAddCandidate}>+</button>
     </div>
   );
